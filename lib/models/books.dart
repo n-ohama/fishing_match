@@ -17,8 +17,7 @@ class Books with ChangeNotifier {
 
   Future<void> fetchData() async {
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('books').get();
+      final snapshot = await FirebaseFirestore.instance.collection('books').get();
       final bookList = snapshot.docs.map((doc) {
         Map<String, dynamic> book = doc.data();
         return Book(
@@ -53,9 +52,7 @@ class Books with ChangeNotifier {
 
     if (imageFile != null) {
       await ref.putFile(imageFile);
-      downloadURL = await FirebaseStorage.instance
-          .ref('ship_post/$imageId.png')
-          .getDownloadURL();
+      downloadURL = await FirebaseStorage.instance.ref('ship_post/$imageId.png').getDownloadURL();
     }
 
     final Book newBook = Book(
@@ -91,6 +88,7 @@ class Books with ChangeNotifier {
       'isRequiredTool': newBook.isRequiredTool,
       'memberList': newBook.memberList,
       'picture': downloadURL,
+      'ownerId': newBook.ownerId,
     };
     await FirebaseFirestore.instance.collection('books').add(mapBook);
     _items.add(newBook);

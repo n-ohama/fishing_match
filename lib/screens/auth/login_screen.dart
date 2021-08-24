@@ -71,11 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Text('まだアカウントを持っていない場合は、'),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pushReplacementNamed(SignupScreen.routeName);
-                          },
-                          child: Text('新規登録ページへ', style: underLineStyle),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pushReplacementNamed(SignupScreen.routeName);
+                            },
+                            child: Text('新規登録ページへ', style: underLineStyle),
+                          ),
                         ),
                       ],
                     ),

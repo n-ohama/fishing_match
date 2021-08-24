@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 TextStyle bigFontStyle = TextStyle(fontSize: 16);
 TextStyle underLineStyle = TextStyle(
-  fontSize: 16,
   decoration: TextDecoration.underline,
 );
 

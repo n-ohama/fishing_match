@@ -267,14 +267,15 @@ class _AddbookScreenState extends State<AddbookScreen> {
                     pickDay == null
                         ? Text('日付を選択してください', style: TextStyle(color: Colors.black54))
                         : Text('${DateFormat('yyyy年MM月dd日').format(pickDay!)}'),
+                    SizedBox(width: 4),
                     pickTime == null
                         ? Text('時間を選択してください', style: TextStyle(color: Colors.black54))
                         : Text(
-                            '${DateFormat('HH時mm分').format(DateTime(0, 0, 0, pickTime!.hour, pickTime!.minute))}'),
-                    SizedBox(width: 48),
+                            '${DateFormat('HH時mm分').format(DateTime(0, 0, 0, pickTime!.hour, pickTime!.minute))}',
+                          ),
                   ],
                 ),
-                Divider(thickness: 3),
+                Divider(thickness: 2),
                 SizedBox(height: 8),
                 TextField(
                   decoration: InputDecoration(hintText: '狙い(魚名)', labelText: '狙い(魚名)'),

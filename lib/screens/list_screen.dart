@@ -57,11 +57,36 @@ class _ListScreenState extends State<ListScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (ctx) => AddbookScreen(uid),
-          );
+          if (isLogin) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (ctx) => AddbookScreen(uid),
+            );
+          } else {
+            showDialog(
+              context: context,
+              builder: (dialogCtx) => AlertDialog(
+                title: Text('ログイン後、募集可能です。ログインしますか？'),
+                actions: [
+                  ElevatedButton(
+                    child: Text('Yes'),
+                    style: ElevatedButton.styleFrom(primary: Colors.blue),
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: Text('No'),
+                    style: ElevatedButton.styleFrom(primary: Colors.red[300]),
+                    onPressed: () {
+                      Navigator.of(dialogCtx).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
         },
       ),
       appBar: AppBar(
@@ -71,8 +96,7 @@ class _ListScreenState extends State<ListScreen> {
             TextButton(
               child: Text('ログイン', style: TextStyle(color: Colors.white)),
               onPressed: () {
-                Navigator.of(context)
-                    .pushReplacementNamed(LoginScreen.routeName);
+                Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
               },
             )
         ],
@@ -89,13 +113,11 @@ class _ListScreenState extends State<ListScreen> {
                 child: ListView.builder(
                   itemCount: bookList.length,
                   itemBuilder: (_, i) => ListTile(
-                    leading: CircleAvatar(
-                        child: Text('${bookList[i].owner.substring(0, 2)}')),
+                    leading: CircleAvatar(child: Text('${bookList[i].owner.substring(0, 2)}')),
                     title: Text(bookList[i].title),
                     trailing: Icon(Icons.arrow_forward_ios),
                     onTap: () {
-                      Navigator.of(context)
-                          .pushNamed(DetailScreen.routeName, arguments: {
+                      Navigator.of(context).pushNamed(DetailScreen.routeName, arguments: {
                         'id': bookList[i].id,
                         'isLogin': isLogin,
                         'uid': uid,
