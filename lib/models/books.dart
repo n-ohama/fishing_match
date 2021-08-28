@@ -17,7 +17,11 @@ class Books with ChangeNotifier {
 
   Future<void> fetchData() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('books').get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('books')
+          .where('leaveDateTime', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
+          .orderBy('leaveDateTime', descending: true)
+          .get();
       final bookList = snapshot.docs.map((doc) {
         Map<String, dynamic> book = doc.data();
         return Book(
@@ -25,9 +29,9 @@ class Books with ChangeNotifier {
           title: book['title'],
           owner: book['owner'],
           leaveDay: book['leaveDay'],
+          leaveDateTime: book['leaveDateTime'].toDate(),
           price: book['price'],
           address: book['address'],
-          currentNumber: book['currentNumber'],
           requireNumber: book['requireNumber'],
           capacity: book['capacity'],
           target: book['target'],
@@ -38,6 +42,7 @@ class Books with ChangeNotifier {
           ownerId: book['ownerId'],
         );
       }).toList();
+      bookList.removeWhere((book) => book.capacity == book.memberList.length);
       _items = bookList;
       notifyListeners();
     } catch (e) {
@@ -60,9 +65,9 @@ class Books with ChangeNotifier {
       title: formBook.title,
       owner: formBook.owner,
       leaveDay: formBook.leaveDay,
+      leaveDateTime: formBook.leaveDateTime,
       price: formBook.price,
       address: formBook.address,
-      currentNumber: formBook.currentNumber,
       requireNumber: formBook.requireNumber,
       capacity: formBook.capacity,
       target: formBook.target,
@@ -78,9 +83,9 @@ class Books with ChangeNotifier {
       'title': newBook.title,
       'owner': newBook.owner,
       'leaveDay': newBook.leaveDay,
+      'leaveDateTime': newBook.leaveDateTime,
       'price': newBook.price,
       'address': newBook.address,
-      'currentNumber': newBook.currentNumber,
       'requireNumber': newBook.requireNumber,
       'capacity': newBook.capacity,
       'target': newBook.target,
@@ -90,12 +95,12 @@ class Books with ChangeNotifier {
       'picture': downloadURL,
       'ownerId': newBook.ownerId,
     };
-    await FirebaseFirestore.instance.collection('books').add(mapBook);
+    await FirebaseFirestore.instance.collection('books').doc(newBook.id).set(mapBook);
     _items.add(newBook);
     notifyListeners();
   }
 
-  void joinBook(Book joinedBook, String uid) {
+  Future<void> joinBook(Book joinedBook, String uid) async {
     final bookIndex = _items.indexWhere((book) => book.id == joinedBook.id);
     final newMemberList = [...joinedBook.memberList, uid];
     final Book newBook = Book(
@@ -103,9 +108,9 @@ class Books with ChangeNotifier {
       title: joinedBook.title,
       owner: joinedBook.owner,
       leaveDay: joinedBook.leaveDay,
+      leaveDateTime: joinedBook.leaveDateTime,
       price: joinedBook.price,
       address: joinedBook.address,
-      currentNumber: joinedBook.currentNumber + 1,
       requireNumber: joinedBook.requireNumber,
       capacity: joinedBook.capacity,
       target: joinedBook.target,
@@ -115,6 +120,38 @@ class Books with ChangeNotifier {
       picture: joinedBook.picture,
       ownerId: joinedBook.ownerId,
     );
+    await FirebaseFirestore.instance
+        .collection('books')
+        .doc(newBook.id)
+        .update({'memberList': newMemberList});
+    _items[bookIndex] = newBook;
+    notifyListeners();
+  }
+
+  Future<void> cancelBook(Book cancelBook, String uid) async {
+    final bookIndex = _items.indexWhere((book) => book.id == cancelBook.id);
+    cancelBook.memberList.remove(uid);
+    final Book newBook = Book(
+      id: cancelBook.id,
+      title: cancelBook.title,
+      owner: cancelBook.owner,
+      leaveDay: cancelBook.leaveDay,
+      leaveDateTime: cancelBook.leaveDateTime,
+      price: cancelBook.price,
+      address: cancelBook.address,
+      requireNumber: cancelBook.requireNumber,
+      capacity: cancelBook.capacity,
+      target: cancelBook.target,
+      note: cancelBook.note,
+      isRequiredTool: cancelBook.isRequiredTool,
+      memberList: cancelBook.memberList,
+      picture: cancelBook.picture,
+      ownerId: cancelBook.ownerId,
+    );
+    await FirebaseFirestore.instance
+        .collection('books')
+        .doc(newBook.id)
+        .update({'memberList': cancelBook.memberList});
     _items[bookIndex] = newBook;
     notifyListeners();
   }

@@ -3,9 +3,9 @@ class Book {
   final String title;
   final String owner;
   final String leaveDay;
+  final DateTime leaveDateTime;
   final int price;
   final String address;
-  final int currentNumber;
   final int requireNumber;
   final int capacity;
   final String target;
@@ -19,9 +19,9 @@ class Book {
     required this.title,
     required this.owner,
     required this.leaveDay,
+    required this.leaveDateTime,
     required this.price,
     required this.address,
-    required this.currentNumber,
     required this.requireNumber,
     required this.capacity,
     required this.target,

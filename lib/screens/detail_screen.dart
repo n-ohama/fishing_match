@@ -55,7 +55,7 @@ class DetailScreen extends StatelessWidget {
                 SizedBox(width: 32),
                 Consumer<Books>(
                   builder: (_, bookProvider, __) => Text(
-                    '${bookProvider.findById(args['id']).currentNumber}名',
+                    '${bookProvider.findById(args['id']).memberList.length}名',
                     style: bigFontStyle,
                   ),
                 ),
@@ -65,7 +65,7 @@ class DetailScreen extends StatelessWidget {
             ),
             Consumer<Books>(builder: (_, bookProvider, __) {
               int requireNumber = bookProvider.findById(args['id']).requireNumber -
-                  bookProvider.findById(args['id']).currentNumber;
+                  bookProvider.findById(args['id']).memberList.length;
               return requireNumber > 0
                   ? Text(
                       '最低でもあと$requireNumber名参加すれば出港可能です。',
@@ -75,17 +75,48 @@ class DetailScreen extends StatelessWidget {
             }),
             Consumer<Books>(builder: (_, bookProvider, __) {
               return ElevatedButton(
-                onPressed: bookProvider.findById(args['id']).memberList.contains(args['uid'])
+                onPressed: bookProvider.findById(args['id']).ownerId == args['uid']
                     ? null
-                    : () {
+                    : () async {
                         if (args['isLogin']) {
-                          Provider.of<Books>(context, listen: false)
-                              .joinBook(bookProvider.findById(args['id']), args['uid']);
+                          if (bookProvider.findById(args['id']).memberList.contains(args['uid'])) {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text('参加をキャンセルしますか？'),
+                                actions: [
+                                  ElevatedButton(
+                                    child: Text('Yes'),
+                                    style: ElevatedButton.styleFrom(primary: Colors.blue),
+                                    onPressed: () {
+                                      Provider.of<Books>(context, listen: false).cancelBook(
+                                          bookProvider.findById(args['id']), args['uid']);
+                                      Navigator.of(ctx).pop();
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    child: Text('No'),
+                                    style: ElevatedButton.styleFrom(primary: Colors.red[300]),
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            await Provider.of<Books>(context, listen: false)
+                                .joinBook(bookProvider.findById(args['id']), args['uid']);
+                          }
                         } else {
                           showUpModal(context);
                         }
                       },
-                style: ElevatedButton.styleFrom(primary: Colors.red[300]),
+                style: ElevatedButton.styleFrom(
+                  primary: bookProvider.findById(args['id']).memberList.contains(args['uid'])
+                      ? Colors.grey[300]
+                      : Colors.red[300],
+                ),
                 child: Text(
                   '参加する',
                   style: TextStyle(fontSize: 16),

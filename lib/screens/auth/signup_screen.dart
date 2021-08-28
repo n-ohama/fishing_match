@@ -15,7 +15,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final rePasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool _isObscure = true;
+  bool _isReObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -24,72 +27,109 @@ class _SignupScreenState extends State<SignupScreen> {
       drawer: AppDrawer(false),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      child: Text('メールアドレス'),
-                      alignment: Alignment.topLeft,
-                    ),
-                    TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(hintText: 'example@gmail.com'),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      child: Text('パスワード'),
-                      alignment: Alignment.topLeft,
-                    ),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      child: Text('パスワード(確認用)'),
-                      alignment: Alignment.topLeft,
-                    ),
-                    TextField(
-                      controller: rePasswordController,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        await AuthModel()
-                            .signUpWithEmailAndPassword(
-                                emailController.text, passwordController.text)
-                            .then((user) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          Navigator.of(context).pushReplacementNamed('/');
-                        });
-                      },
-                      child: Text('登録する'),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text('すでにアカウントを持っている場合は、'),
-                        Expanded(
-                          child: TextButton(
+          : Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Container(
+                        child: Text('メールアドレス'),
+                        alignment: Alignment.topLeft,
+                      ),
+                      TextFormField(
+                        controller: emailController,
+                        validator: (value) {
+                          return RegExp(
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  .hasMatch(value!)
+                              ? null
+                              : "メールアドレスの入力です。";
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(hintText: 'example@gmail.com'),
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        child: Text('パスワード'),
+                        alignment: Alignment.topLeft,
+                      ),
+                      TextFormField(
+                        controller: passwordController,
+                        validator: (value) {
+                          return value!.length > 5 ? null : "6文字以上で入力してください。";
+                        },
+                        obscureText: _isObscure,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.visibility),
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+                              _isObscure = !_isObscure;
+                              setState(() {});
                             },
-                            child: Text('ログインページへ', style: underLineStyle),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        child: Text('パスワード(確認用)'),
+                        alignment: Alignment.topLeft,
+                      ),
+                      TextFormField(
+                        controller: rePasswordController,
+                        validator: (value) {
+                          return value == passwordController.text ? null : '上と同じように入力してください。';
+                        },
+                        obscureText: _isReObscure,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.visibility),
+                            onPressed: () {
+                              _isReObscure = !_isReObscure;
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
+                          setState(() {
+                            isLoading = true;
+                          });
+                          await AuthModel()
+                              .signUpWithEmailAndPassword(
+                                  emailController.text, passwordController.text)
+                              .then((user) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            Navigator.of(context).pushReplacementNamed('/');
+                          });
+                        },
+                        child: Text('登録する'),
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text('すでにアカウントを持っている場合は、'),
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+                              },
+                              child: Text('ログインページへ', style: underLineStyle),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -8,6 +8,8 @@ import 'package:fishing_match/screens/list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -33,6 +35,14 @@ class MyApp extends StatelessWidget {
           Debag.routeName: (_) => Debag(),
         },
         home: ListScreen(),
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale("en"),
+          const Locale("ja"),
+        ],
       ),
     );
   }

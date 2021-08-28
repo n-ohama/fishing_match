@@ -14,7 +14,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -23,65 +25,91 @@ class _LoginScreenState extends State<LoginScreen> {
       drawer: AppDrawer(false),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      child: Text('メールアドレス'),
-                      alignment: Alignment.topLeft,
-                    ),
-                    TextField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(hintText: 'example@gmail.com'),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      child: Text('パスワード'),
-                      alignment: Alignment.topLeft,
-                    ),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        AuthModel()
-                            .signInWithEmailAndPassword(
-                                _emailController.text, _passwordController.text)
-                            .then(
-                          (_) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                            Navigator.of(context).pushReplacementNamed('/');
-                          },
-                        );
-                      },
-                      child: Text('ログインする'),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text('まだアカウントを持っていない場合は、'),
-                        Expanded(
-                          child: TextButton(
+          : Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                  child: ListView(
+                    // mainAxisSize: MainAxisSize.min,
+                    shrinkWrap: true,
+                    children: [
+                      Container(
+                        child: Text('メールアドレス'),
+                        alignment: Alignment.topLeft,
+                      ),
+                      TextFormField(
+                        controller: _emailController,
+                        validator: (value) {
+                          return RegExp(
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  .hasMatch(value!)
+                              ? null
+                              : "メールアドレスの入力です。";
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(hintText: 'example@gmail.com'),
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        child: Text('パスワード'),
+                        alignment: Alignment.topLeft,
+                      ),
+                      TextFormField(
+                        controller: _passwordController,
+                        validator: (value) {
+                          return value!.length > 5 ? null : "6文字以上で入力してください。";
+                        },
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed(SignupScreen.routeName);
+                              _isObscure = !_isObscure;
+                              setState(() {});
                             },
-                            child: Text('新規登録ページへ', style: underLineStyle),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                        obscureText: _isObscure,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
+                          setState(() {
+                            isLoading = true;
+                          });
+                          AuthModel()
+                              .signInWithEmailAndPassword(
+                                  _emailController.text, _passwordController.text)
+                              .then(
+                            (_) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              Navigator.of(context).pushReplacementNamed('/');
+                            },
+                          );
+                        },
+                        child: Text('ログインする'),
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text('まだアカウントを持っていない場合は、'),
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pushReplacementNamed(SignupScreen.routeName);
+                              },
+                              child: Text('新規登録ページへ', style: underLineStyle),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

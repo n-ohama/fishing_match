@@ -110,19 +110,83 @@ class _ListScreenState extends State<ListScreen> {
                 onRefresh: () async {
                   await Provider.of<Books>(context, listen: false).fetchData();
                 },
-                child: ListView.builder(
-                  itemCount: bookList.length,
-                  itemBuilder: (_, i) => ListTile(
-                    leading: CircleAvatar(child: Text('${bookList[i].owner.substring(0, 2)}')),
-                    title: Text(bookList[i].title),
-                    trailing: Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      Navigator.of(context).pushNamed(DetailScreen.routeName, arguments: {
-                        'id': bookList[i].id,
-                        'isLogin': isLogin,
-                        'uid': uid,
-                      });
-                    },
+                child: GridView.count(
+                  padding: EdgeInsets.all(10.0),
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.9,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  shrinkWrap: true,
+                  children: List.generate(
+                    bookList.length,
+                    (i) => GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(DetailScreen.routeName, arguments: {
+                          'id': bookList[i].id,
+                          'isLogin': isLogin,
+                          'uid': uid,
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey,
+                              offset: Offset(5.0, 5.0),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Image.network(bookList[i].picture),
+                            Container(
+                              margin: EdgeInsets.only(left: 8, top: 4),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      '${bookList[i].title}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      '投稿者: ${bookList[i].owner}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      '料金: ${bookList[i].price}円',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      '日付: ${bookList[i].leaveDay}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

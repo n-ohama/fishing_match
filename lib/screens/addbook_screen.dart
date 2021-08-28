@@ -25,7 +25,6 @@ class _AddbookScreenState extends State<AddbookScreen> {
   int? price;
   String? address;
   String? leaveDay;
-  int currentNumber = 1;
   int? requireNumber;
   int? capacity;
   String? target;
@@ -226,6 +225,7 @@ class _AddbookScreenState extends State<AddbookScreen> {
                         onPressed: () async {
                           final pickedDay = await showDatePicker(
                             context: context,
+                            locale: const Locale("ja"),
                             initialDate: pickDay ?? DateTime.now(),
                             firstDate: DateTime(now.year),
                             lastDate: DateTime(now.year + 1),
@@ -301,9 +301,9 @@ class _AddbookScreenState extends State<AddbookScreen> {
                   onPressed: () async {
                     onSaveForm();
                     final id = Uuid().v1();
+                    final pickDateTime = DateTime(pickDay!.year, pickDay!.month, pickDay!.day,
+                        pickTime!.hour, pickTime!.minute);
                     if (pickDay != null && pickTime != null) {
-                      final pickDateTime = DateTime(pickDay!.year, pickDay!.month, pickDay!.day,
-                          pickTime!.hour, pickTime!.minute);
                       setState(() {
                         leaveDay = DateFormat('MM月dd日 - HH:mm').format(pickDateTime);
                       });
@@ -314,7 +314,6 @@ class _AddbookScreenState extends State<AddbookScreen> {
                       price,
                       address,
                       leaveDay,
-                      currentNumber,
                       requireNumber,
                       capacity,
                       target
@@ -335,9 +334,9 @@ class _AddbookScreenState extends State<AddbookScreen> {
                         title: title!,
                         owner: owner!,
                         leaveDay: leaveDay!,
+                        leaveDateTime: pickDateTime,
                         price: price!,
                         address: address!,
-                        currentNumber: currentNumber,
                         requireNumber: requireNumber!,
                         capacity: capacity!,
                         target: target!,
