@@ -84,11 +84,34 @@ class _LoginScreenState extends State<LoginScreen> {
                               .signInWithEmailAndPassword(
                                   _emailController.text, _passwordController.text)
                               .then(
-                            (_) {
+                            (value) {
                               setState(() {
                                 isLoading = false;
                               });
-                              Navigator.of(context).pushReplacementNamed('/');
+                              if (value.isEmpty) {
+                                Navigator.of(context).pushReplacementNamed('/');
+                              } else {
+                                final String errorMsg = value == 'user-not-found'
+                                    ? 'ユーザが見つかりません。'
+                                    : value == 'wrong-password'
+                                        ? 'パスワードが間違っています。'
+                                        : value;
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: Text(errorMsg),
+                                    actions: [
+                                      ElevatedButton(
+                                        child: Text('OK'),
+                                        // style: ElevatedButton.styleFrom(primary: Colors.red[300]),
+                                        onPressed: () {
+                                          Navigator.of(ctx).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                             },
                           );
                         },

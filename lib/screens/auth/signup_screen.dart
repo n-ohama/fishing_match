@@ -64,7 +64,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         obscureText: _isObscure,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.visibility),
+                            icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
                             onPressed: () {
                               _isObscure = !_isObscure;
                               setState(() {});
@@ -80,12 +80,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         controller: rePasswordController,
                         validator: (value) {
-                          return value == passwordController.text ? null : '上と同じように入力してください。';
+                          return value == passwordController.text ? null : '同じパスワードを入力してください。';
                         },
                         obscureText: _isReObscure,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.visibility),
+                            icon: Icon(_isReObscure ? Icons.visibility : Icons.visibility_off),
                             onPressed: () {
                               _isReObscure = !_isReObscure;
                               setState(() {});
@@ -105,11 +105,31 @@ class _SignupScreenState extends State<SignupScreen> {
                           await AuthModel()
                               .signUpWithEmailAndPassword(
                                   emailController.text, passwordController.text)
-                              .then((user) {
+                              .then((value) {
                             setState(() {
                               isLoading = false;
                             });
-                            Navigator.of(context).pushReplacementNamed('/');
+                            if (value.isEmpty) {
+                              Navigator.of(context).pushReplacementNamed('/');
+                            } else {
+                              final String errorMsg =
+                                  value == 'email-already-in-use' ? 'すでにそのメールアドレスは使われています。' : value;
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text(errorMsg),
+                                  actions: [
+                                    ElevatedButton(
+                                      child: Text('OK'),
+                                      // style: ElevatedButton.styleFrom(primary: Colors.red[300]),
+                                      onPressed: () {
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
                           });
                         },
                         child: Text('登録する'),

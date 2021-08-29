@@ -4,19 +4,26 @@ import 'package:fishing_match/models/shared_model.dart';
 class AuthModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future signInWithEmailAndPassword(String email, String password) async {
-    UserCredential result =
-        await _auth.signInWithEmailAndPassword(email: email, password: password);
-    User? user = result.user;
+  Future<String> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential result =
+          await _auth.signInWithEmailAndPassword(email: email, password: password);
+      User? user = result.user;
 
-    SharedModel.saveLoggedIn(true);
-    SharedModel.saveUid(user!.uid);
-    SharedModel.saveUserEmail(user.email ?? '');
+      SharedModel.saveLoggedIn(true);
+      SharedModel.saveUid(user!.uid);
+      SharedModel.saveUserEmail(user.email ?? '');
 
-    return user;
+      return '';
+    } on FirebaseAuthException catch (e) {
+      return e.code;
+    } catch (e) {
+      print(e.toString());
+      return e.toString();
+    }
   }
 
-  Future signUpWithEmailAndPassword(String email, String password) async {
+  Future<String> signUpWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential result =
           await _auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -26,9 +33,12 @@ class AuthModel {
       SharedModel.saveUid(user!.uid);
       SharedModel.saveUserEmail(user.email ?? '');
 
-      return user;
+      return '';
+    } on FirebaseAuthException catch (e) {
+      return e.code;
     } catch (e) {
       print(e.toString());
+      return e.toString();
     }
   }
 

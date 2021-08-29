@@ -27,10 +27,10 @@ class _ListScreenState extends State<ListScreen> {
     });
     await SharedModel.getUid().then((value) {
       setState(() {
-        if (value != null && value.isNotEmpty) {
-          uid = value;
-        } else {
+        if (value == null || value.isEmpty) {
           isLogin = false;
+        } else {
+          uid = value;
         }
       });
     });
