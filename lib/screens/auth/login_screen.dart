@@ -120,13 +120,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 8),
                       Row(
                         children: [
-                          Text('まだアカウントを持っていない場合は、'),
+                          Text('まだアカウントを持っていない場合は、', style: TextStyle(fontSize: 14)),
                           Expanded(
                             child: TextButton(
                               onPressed: () {
                                 Navigator.of(context).pushReplacementNamed(SignupScreen.routeName);
                               },
-                              child: Text('新規登録ページへ', style: underLineStyle),
+                              child: Text('こちら', style: underLineStyle),
                             ),
                           ),
                         ],

@@ -140,7 +140,9 @@ class _ListScreenState extends State<ListScreen> {
                         ),
                         child: Column(
                           children: [
-                            Image.network(bookList[i].picture),
+                            bookList[i].picture != ''
+                                ? Image.network(bookList[i].picture)
+                                : Image.asset('assets/images/noimage_home.jpeg', fit: BoxFit.cover),
                             Container(
                               margin: EdgeInsets.only(left: 8, top: 4),
                               child: Column(

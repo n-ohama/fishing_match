@@ -214,15 +214,17 @@ class _AddbookScreenState extends State<AddbookScreen> {
                   decoration: InputDecoration(hintText: '集合場所', labelText: '集合場所'),
                   controller: addressController,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 16),
                 Text('集合時間', style: TextStyle(color: Colors.black54, fontSize: 16)),
+                SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SizedBox(
                       width: 150,
                       child: ElevatedButton(
                         onPressed: () async {
+                          FocusScope.of(context).unfocus();
                           final pickedDay = await showDatePicker(
                             context: context,
                             locale: const Locale("ja"),
@@ -244,6 +246,7 @@ class _AddbookScreenState extends State<AddbookScreen> {
                       width: 150,
                       child: ElevatedButton(
                         onPressed: () async {
+                          FocusScope.of(context).unfocus();
                           final pickedTime = await showTimePicker(
                             context: context,
                             initialTime: pickTime ?? TimeOfDay.now(),
@@ -262,20 +265,42 @@ class _AddbookScreenState extends State<AddbookScreen> {
                 ),
                 SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    pickDay == null
-                        ? Text('日付を選択してください', style: TextStyle(color: Colors.black54))
-                        : Text('${DateFormat('yyyy年MM月dd日').format(pickDay!)}'),
-                    SizedBox(width: 4),
-                    pickTime == null
-                        ? Text('時間を選択してください', style: TextStyle(color: Colors.black54))
-                        : Text(
-                            '${DateFormat('HH時mm分').format(DateTime(0, 0, 0, pickTime!.hour, pickTime!.minute))}',
+                    Column(
+                      children: [
+                        pickDay == null
+                            ? Text('日付を選択してください',
+                                style: TextStyle(color: Colors.black54, fontSize: 12))
+                            : Text('${DateFormat('yyyy年MM月dd日').format(pickDay!)}'),
+                        Container(
+                          width: 150,
+                          child: Divider(
+                            thickness: 1,
+                            color: Colors.grey,
                           ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        pickTime == null
+                            ? Text('時間を選択してください',
+                                style: TextStyle(color: Colors.black54, fontSize: 12))
+                            : Text(
+                                '${DateFormat('HH時mm分').format(DateTime(0, 0, 0, pickTime!.hour, pickTime!.minute))}',
+                              ),
+                        Container(
+                          width: 150,
+                          child: Divider(
+                            thickness: 1,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-                Divider(thickness: 2),
                 SizedBox(height: 8),
                 TextField(
                   decoration: InputDecoration(hintText: '狙い(魚名)', labelText: '狙い(魚名)'),

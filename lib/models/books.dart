@@ -96,11 +96,12 @@ class Books with ChangeNotifier {
       'ownerId': newBook.ownerId,
     };
     await FirebaseFirestore.instance.collection('books').doc(newBook.id).set(mapBook);
-    _items.add(newBook);
+    // _items.add(newBook);
+    _items.insert(0, newBook);
     notifyListeners();
   }
 
-  Future<void> joinBook(Book joinedBook, String uid) async {
+  Future<void> joinBook(Book joinedBook, String uid, BuildContext context) async {
     final bookIndex = _items.indexWhere((book) => book.id == joinedBook.id);
     final newMemberList = [...joinedBook.memberList, uid];
     final Book newBook = Book(
@@ -120,12 +121,25 @@ class Books with ChangeNotifier {
       picture: joinedBook.picture,
       ownerId: joinedBook.ownerId,
     );
-    await FirebaseFirestore.instance
-        .collection('books')
-        .doc(newBook.id)
-        .update({'memberList': newMemberList});
-    _items[bookIndex] = newBook;
-    notifyListeners();
+
+    final bookData = await FirebaseFirestore.instance.collection('books').doc(newBook.id).get();
+    if (bookData['memberList'].length > newBook.capacity) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('申し訳ございません。定員がオーバーしたため、参加できませんでした。'),
+        ),
+      ).then((_) {
+        Navigator.of(context).pushReplacementNamed('/');
+      });
+    } else {
+      await FirebaseFirestore.instance
+          .collection('books')
+          .doc(newBook.id)
+          .update({'memberList': newMemberList});
+      _items[bookIndex] = newBook;
+      notifyListeners();
+    }
   }
 
   Future<void> cancelBook(Book cancelBook, String uid) async {

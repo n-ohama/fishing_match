@@ -47,7 +47,7 @@ class DetailScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 16),
               child: selectedBook.picture != ''
                   ? Image.network(selectedBook.picture)
-                  : Image.asset('assets/images/noimage.png'),
+                  : Image.asset('assets/images/noimage_home.jpeg'),
             ),
             Row(
               children: [
@@ -55,7 +55,7 @@ class DetailScreen extends StatelessWidget {
                 SizedBox(width: 32),
                 Consumer<Books>(
                   builder: (_, bookProvider, __) => Text(
-                    '${bookProvider.findById(args['id']).memberList.length}名',
+                    '${bookProvider.findById(args['id']).memberList.length - 1}名',
                     style: bigFontStyle,
                   ),
                 ),
@@ -106,7 +106,7 @@ class DetailScreen extends StatelessWidget {
                             );
                           } else {
                             await Provider.of<Books>(context, listen: false)
-                                .joinBook(bookProvider.findById(args['id']), args['uid']);
+                                .joinBook(bookProvider.findById(args['id']), args['uid'], context);
                           }
                         } else {
                           showUpModal(context);
