@@ -123,7 +123,7 @@ class Books with ChangeNotifier {
     );
 
     final bookData = await FirebaseFirestore.instance.collection('books').doc(newBook.id).get();
-    if (bookData['memberList'].length > newBook.capacity) {
+    if (bookData['memberList'].length > bookData['capacity']) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
