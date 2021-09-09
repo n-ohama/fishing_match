@@ -1,7 +1,6 @@
 import 'package:fishing_match/constants.dart';
 import 'package:fishing_match/models/auth_model.dart';
 import 'package:fishing_match/screens/auth/login_screen.dart';
-import 'package:fishing_match/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -24,7 +23,6 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('新規登録')),
-      drawer: AppDrawer(false),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Form(
@@ -42,9 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         controller: emailController,
                         validator: (value) {
-                          return RegExp(
-                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                  .hasMatch(value!)
+                          return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)
                               ? null
                               : "メールアドレスの入力です。";
                         },
@@ -102,18 +98,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          await AuthModel()
-                              .signUpWithEmailAndPassword(
-                                  emailController.text, passwordController.text)
-                              .then((value) {
+                          await AuthModel().signUpWithEmailAndPassword(emailController.text, passwordController.text).then((value) {
                             setState(() {
                               isLoading = false;
                             });
                             if (value.isEmpty) {
                               Navigator.of(context).pushReplacementNamed('/');
                             } else {
-                              final String errorMsg =
-                                  value == 'email-already-in-use' ? 'すでにそのメールアドレスは使われています。' : value;
+                              final String errorMsg = value == 'email-already-in-use' ? 'すでにそのメールアドレスは使われています。' : value;
                               showDialog(
                                 context: context,
                                 builder: (ctx) => AlertDialog(

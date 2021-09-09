@@ -1,7 +1,6 @@
 import 'package:fishing_match/constants.dart';
 import 'package:fishing_match/models/auth_model.dart';
 import 'package:fishing_match/screens/auth/signup_screen.dart';
-import 'package:fishing_match/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('ログイン')),
-      drawer: AppDrawer(false),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Form(
@@ -41,9 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: _emailController,
                         validator: (value) {
-                          return RegExp(
-                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                  .hasMatch(value!)
+                          return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)
                               ? null
                               : "メールアドレスの入力です。";
                         },
@@ -80,10 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          AuthModel()
-                              .signInWithEmailAndPassword(
-                                  _emailController.text, _passwordController.text)
-                              .then(
+                          AuthModel().signInWithEmailAndPassword(_emailController.text, _passwordController.text).then(
                             (value) {
                               setState(() {
                                 isLoading = false;
